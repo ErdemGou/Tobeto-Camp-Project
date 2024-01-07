@@ -11,11 +11,19 @@ import {
   Label,
   Menu,
   Table,
+  Button,
 } from "semantic-ui-react";
 import ProductService from "../services/productService";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../store/actions/cartActions";
+import {toast} from "react-toastify";
+
+
 
 export default function ProductList() {
+  const dispatch = useDispatch();
+
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -23,29 +31,40 @@ export default function ProductList() {
     productService
       .getProduct()
       .then((result) => setProducts(result.data.products));
-  },[]);
+  }, []);
+
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product));
+    toast.success(`${product.title} sepete eklendi!`)
+  };
 
   return (
     <div>
       <Table celled>
         <TableHeader>
-          <TableRow >
+          <TableRow>
             <TableHeaderCell>Ürün Adı</TableHeaderCell>
             <TableHeaderCell>Birim Fiyati</TableHeaderCell>
             <TableHeaderCell>Stok Adedi</TableHeaderCell>
             <TableHeaderCell>Açıklama</TableHeaderCell>
             <TableHeaderCell>Kategori</TableHeaderCell>
+            <TableHeaderCell></TableHeaderCell>
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id}>
-              <TableCell><Link to={`/product/${product.id}`}>{product.title}</Link></TableCell>
+              <TableCell>
+                <Link to={`/product/${product.id}`}>{product.title}</Link>
+              </TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>{product.description}</TableCell>
               <TableCell>{product.category}</TableCell>
+              <TableCell>
+                <Button onClick={() => handleAddToCart(product)}>Sepete Ekle</Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
